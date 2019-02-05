@@ -6,9 +6,9 @@ const DAYS = 24 * HOURS;
 
 // config stuff
 export const scannerCount = 4;
-export const speed = 1000;
-export const updateInterval = 500 * MS;
-export const runtime = 5 * MINUTES;
+export const speed = 99999999;
+export const updateInterval = 10 * MS;
+export const runtime = 2 * HOURS;
 
 export const sqlConfig = {
     driver: 'msnodesqlv8',

@@ -7,11 +7,11 @@ import { denormalizedSqlReporter as reporter } from "./reporters/index";
 const globalTimer = timer();
 configure({
   timer: globalTimer,
-  reporter: reporter
+  reporter
 });
 const scanners = new Array(scannerCount)
   .fill(0)
-  .map(() => scanner(globalTimer));
+  .map((item, index) => scanner(index + 1, globalTimer));
 
 function go() {
   scanners.forEach(s => s.start());
@@ -23,6 +23,10 @@ function stop() {
 }
 
 go();
+
 setTimeout(() => {
+  globalTimer.done(() => {
+    process.exit();
+  });
   stop();
 }, runtime);

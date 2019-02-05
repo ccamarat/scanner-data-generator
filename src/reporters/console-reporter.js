@@ -1,5 +1,5 @@
 export const consoleReporter = {
-  capture(event) {
+  capture({ event, data, timestamp }) {
     console.log(event);
   },
   report() {}

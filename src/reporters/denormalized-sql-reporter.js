@@ -5,6 +5,24 @@ const EVENT_TABLE_NAME = `${SCHEMA_NAME}.DnEvents`;
 const RACK_TABLE_NAME = `${SCHEMA_NAME}.Racks`;
 const SLIDE_TABLE_NAME = `${SCHEMA_NAME}.Slides`;
 
+export const denormalizedSqlReporter = {
+  capture({ event, data, timestamp }) {
+    let val;
+    if (handlers[event]) {
+      val = eventSql({
+        ...handlers[event](data, timestamp),
+        name: event,
+        timestamp
+      });
+    }
+    if (val) {
+      log(val);
+    }
+  },
+  report() {
+  }
+};
+
 async function log(sql) {
   try {
     const result = await exec(sql);
@@ -105,26 +123,8 @@ const handlers = {
   }
 };
 
-export const denormalizedSqlReporter = {
-  capture({ event, data, timestamp }) {
-    let val;
-    if (handlers[event]) {
-      val = eventSql({
-        ...handlers[event](data, timestamp),
-        name: event,
-        timestamp
-      });
-    }
-    if (val) {
-      log(val);
-    }
-  },
-  report() {
-  }
-};
-
 function addRackSql({ scannerId, id, position, type, capacity }) {
-  return `INSERT INTO ${RACK_TABLE_NAME} (ScannerGuid, RackGuid, Position) VALUES (${g(
+  return `INSERT INTO ${RACK_TABLE_NAME} (ScannerId, RackGuid, Position) VALUES (${n(
     scannerId
   )}, ${g(id)}, ${n(position)})`;
 }
@@ -142,7 +142,7 @@ function updateRackSql({ scannerId, id, position, type, capacity }) {
   }
   return `UPDATE ${RACK_TABLE_NAME} SET ${udpateClause.join(
     ", "
-  )} WHERE ScannerGuid = ${g(scannerId)} AND RackGuid = ${g(id)}`;
+  )} WHERE ScannerId = ${n(scannerId)} AND RackGuid = ${g(id)}`;
 }
 
 function addSlideSql({ rackId, id, position }) {
@@ -158,12 +158,12 @@ function eventSql(val) {
   const items = val
     .map(
       v =>
-        `(${g(v.scannerId)}, ${g(v.rackId)}, ${g(v.slideId)}, ${s(v.name)}, ${s(
+        `(${n(v.scannerId)}, ${g(v.rackId)}, ${g(v.slideId)}, ${s(v.name)}, ${s(
           v.value
         )}, ${s(d(v.timestamp))})`
     )
     .join(", ");
-  return `INSERT INTO ${EVENT_TABLE_NAME} (ScannerGuid, RackGuid, SlideGuid, Name, Value, Timestamp) VALUES ${items}`;
+  return `INSERT INTO ${EVENT_TABLE_NAME} (ScannerId, RackGuid, SlideGuid, Name, Value, Timestamp) VALUES ${items}`;
 }
 
 function s(val) {

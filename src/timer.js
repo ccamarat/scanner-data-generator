@@ -1,22 +1,50 @@
 import { speed, updateInterval } from "./consts";
 
-export function timer(startTime = 1499999999999) {
-  let time = new Date(startTime);
+export function timer(startTime = 1500000000000) {
+  let clock = new Date(startTime);
+  const interrupts = [];
+  let doneCallback;
+
   const t = {
     get time() {
-      return time;
+      return clock;
     },
+
     wait(howlongSec = 0) {
-      time = new Date(time.getTime() + howlongSec * 1000);
-      return wait(howlongSec / speed);
+      let interrupt = {};
+      const promise = new Promise(resolve => {
+        interrupt.timeout = new Date(clock.getTime() + howlongSec * 1000);
+        interrupt.resolve = resolve;
+      });
+      interrupts.push(interrupt);
+      return promise;
     },
-    fork() {
-      return timer(time.getTime());
+
+    done (callback) {
+      doneCallback = callback;
     }
   };
-  setInterval(() => {
-    t.wait((speed * updateInterval) / 1000);
-  }, updateInterval);
+
+  // This recursive iife controls the speed of the timer and the resolution at which it updates.
+  (function () {
+    let lastUpdate = Date.now();
+    (function updateClock() {
+      const msSinceLastUpdate = Date.now() - lastUpdate;
+      lastUpdate += msSinceLastUpdate;
+      clock = new Date(clock.getTime() + speed * msSinceLastUpdate);
+      interrupts.filter(i => clock > i.timeout).forEach(i => {
+        interrupts.splice(interrupts.indexOf(i), 1);
+        i.resolve();
+      });
+
+      if (doneCallback && interrupts.length === 0) {
+        doneCallback();
+      } else {
+        setTimeout(updateClock, updateInterval);
+      }
+    }());
+  }());
+
   return t;
 }
 

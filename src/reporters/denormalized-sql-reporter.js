@@ -1,11 +1,16 @@
+import { exec } from '../data-providers/sql-provider';
+
 const SCHEMA_NAME = "SegueReporting";
 const EVENT_TABLE_NAME = `${SCHEMA_NAME}.DnEvents`;
 const RACK_TABLE_NAME = `${SCHEMA_NAME}.Racks`;
 const SLIDE_TABLE_NAME = `${SCHEMA_NAME}.Slides`;
 
-let buffer = "";
-function log(val) {
-  buffer += val + "\n";
+async function log(sql) {
+  try {
+    const result = await exec(sql);
+  } catch (ex) {
+    console.error(`Error executing query "${sql}", ${ex.message}`);
+  }
 }
 
 const handlers = {
@@ -115,10 +120,6 @@ export const denormalizedSqlReporter = {
     }
   },
   report() {
-    console.log("Waiting events to clear");
-    setTimeout(() => {
-      console.log(buffer);
-    }, 1000);
   }
 };
 

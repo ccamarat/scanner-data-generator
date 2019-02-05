@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "esm": "^3.2.0",
-    "msnodesqlv8": "^0.6.12"
+    "msnodesqlv8": "^0.6.12",
+    "mssql": "^4.3.1"
   }
 }

@@ -2,15 +2,12 @@
   "name": "scanner-data-generator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.html",
+  "main": "src/index.js",
   "scripts": {
-    "start": "parcel index.html --open",
-    "build": "parcel build index.html"
+    "start": "node -r esm src/index.js"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "@babel/core": "7.2.0",
-    "parcel-bundler": "^1.6.1"
-  },
-  "keywords": []
+  "dependencies": {
+    "esm": "^3.2.0",
+    "msnodesqlv8": "^0.6.12"
+  }
 }

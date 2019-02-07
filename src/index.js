@@ -19,13 +19,13 @@ function go() {
 
 function stop() {
   scanners.forEach(s => s.stop());
-  reporter.report();
 }
 
 go();
 
 setTimeout(() => {
   globalTimer.done(() => {
+    closeConnection();
     process.exit();
   });
   stop();

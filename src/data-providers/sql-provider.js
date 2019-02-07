@@ -1,13 +1,22 @@
 import sql from 'mssql/msnodesqlv8';
 import { sqlConfig } from '../consts';
 
+const connection = new sql.ConnectionPool(config);
+const connectionPromise = connection.connect().then(pool => {
+    console.log('Connected to MSSQL')
+    return pool;
+  })
+  .catch(err => {
+      console.log('Database Connection Failed: ', err);
+  });
+
+
 
 export async function exec(query) {
-    try {
-        const pool = new sql.ConnectionPool(sqlConfig);
-        await pool.connect();
-        return pool.request().query(query);
-    } finally {
-        sql.close();
-    }
+    const pool = await connectionPromise;
+    return pool.request().query(query);
+}
+
+export function closeConnection () {
+    sql.close();
 }

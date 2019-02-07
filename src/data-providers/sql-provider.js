@@ -1,7 +1,7 @@
 import sql from 'mssql/msnodesqlv8';
 import { sqlConfig } from '../consts';
 
-const connection = new sql.ConnectionPool(config);
+const connection = new sql.ConnectionPool(sqlConfig);
 const connectionPromise = connection.connect().then(pool => {
     console.log('Connected to MSSQL')
     return pool;
